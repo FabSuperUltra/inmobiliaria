@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda tu cita - Inmobiliaria</title>
+  <style>
+    :root {
+      --main-color: #2c3e50;
+      --accent-color: #3498db;
+      --bg-color: #f4f6f8;
+      --white: #fff;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background-color: var(--bg-color);
+      color: var(--main-color);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+
+    select, input[type="date"], input[type="time"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 2rem;
+      padding: 0.8rem;
+      background: var(--accent-color);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    .summary {
+      margin-top: 2rem;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #ecf0f1;
+    }
+
+    .summary p {
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Agenda tu Cita</h1>
+
+    <form id="appointmentForm">
+      <label for="appointmentType">Tipo de Cita:</label>
+      <select id="appointmentType" required>
+        <option value="">Selecciona una opción</option>
+        <option value="Visita a propiedad">Visita a propiedad</option>
+        <option value="Asesoría inmobiliaria">Asesoría inmobiliaria</option>
+      </select>
+
+      <label for="appointmentDate">Fecha:</label>
+      <input type="date" id="appointmentDate" required min="" />
+
+      <label for="appointmentTime">Hora:</label>
+      <select id="appointmentTime" required>
+        <option value="">Selecciona una hora</option>
+      </select>
+
+      <button type="submit">Confirmar Cita</button>
+    </form>
+
+    <div id="summary" class="summary" style="display: none;">
+      <h3>Cita Confirmada</h3>
+      <p><strong>Tipo:</strong> <span id="summaryType"></span></p>
+      <p><strong>Fecha:</strong> <span id="summaryDate"></span></p>
+      <p><strong>Hora:</strong> <span id="summaryTime"></span></p>
+    </div>
+  </div>
+
+  <script>
+    const dateInput = document.getElementById("appointmentDate");
+    const timeSelect = document.getElementById("appointmentTime");
+    const today = new Date();
+    const yyyyMMdd = today.toISOString().split("T")[0];
+    dateInput.min = yyyyMMdd;
+
+    const hours = [
+      "09:00", "10:00", "11:00",
+      "12:00", "13:00", "15:00",
+      "16:00", "17:00"
+    ];
+
+    dateInput.addEventListener("change", () => {
+      const selectedDate = new Date(dateInput.value);
+      const day = selectedDate.getDay();
+
+      timeSelect.innerHTML = '<option value="">Selecciona una hora</option>';
+
+      if (day === 0 || day === 6) {
+        // No se atiende fines de semana
+        alert("No hay citas disponibles en fines de semana. Elige un día hábil.");
+        dateInput.value = "";
+        return;
+      }
+
+      hours.forEach(hour => {
+        const option = document.createElement("option");
+        option.value = hour;
+        option.textContent = hour;
+        timeSelect.appendChild(option);
+      });
+    });
+
+    document.getElementById("appointmentForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const type = document.getElementById("appointmentType").value;
+      const date = dateInput.value;
+      const time = timeSelect.value;
+
+      if (!type || !date || !time) {
+        alert("Por favor completa todos los campos.");
+        return;
+      }
+
+      document.getElementById("summaryType").textContent = type;
+      document.getElementById("summaryDate").textContent = new Date(date).toLocaleDateString('es-MX', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+      document.getElementById("summaryTime").textContent = time;
+
+      document.getElementById("summary").style.display = "block";
+      this.reset();
+      timeSelect.innerHTML = '<option value="">Selecciona una hora</option>';
+    });
+  </script>
+</body>
+</html>
